@@ -1,6 +1,12 @@
-# Fun Game (Vite + React)
+# Fun Game - Baby Sleep Timer
 
-Hello world React app.
+A baby sleep tracking app built with **React on Vite** and styled with **Tailwind CSS**.
+
+## Tech Stack
+
+- **React** - UI framework
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework for styling
 
 ## Run locally
 
