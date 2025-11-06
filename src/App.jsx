@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function App() {
   const [isSleeping, setIsSleeping] = useState(false)
@@ -18,6 +18,9 @@ export default function App() {
   const [manualEnd, setManualEnd] = useState('') // HH:MM
   const [endsNextDay, setEndsNextDay] = useState(false)
   const [manualError, setManualError] = useState('')
+  const timelineRef = useRef(null)
+  const [drag, setDrag] = useState(null) // { id, mode, fromMin0, toMin0, pointerMin0, fromMin, toMin }
+  const TIMELINE_HEIGHT = 960
 
   useEffect(() => {
     if (!isSleeping || !startAtMs) return
@@ -33,6 +36,18 @@ export default function App() {
     } catch {}
   }, [sessions])
 
+  // Ensure sessions have stable ids (for editing)
+  useEffect(() => {
+    let changed = false
+    const withIds = sessions.map((s) => {
+      if (s.id) return s
+      changed = true
+      return { ...s, id: `${s.start}-${s.end}-${Math.random().toString(36).slice(2, 8)}` }
+    })
+    if (changed) setSessions(withIds)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function handleToggle() {
     if (isSleeping) {
       // Stop
@@ -46,7 +61,7 @@ export default function App() {
           const endDateIso = new Date(end).toISOString().slice(0, 10)
           setSessions((prev) => [
             ...prev,
-            { start: startAtMs, end, startDateIso, endDateIso }
+            { id: `${startAtMs}-${end}-${Math.random().toString(36).slice(2, 8)}` , start: startAtMs, end, startDateIso, endDateIso }
           ])
         }
       }
@@ -93,10 +108,65 @@ export default function App() {
       if (end <= start) return null
       const fromMin = Math.max(0, Math.floor((start - dayStart) / 60000))
       const toMin = Math.min(minutesInDay, Math.ceil((end - dayStart) / 60000))
-      return { fromMin, toMin, start, end }
+      return { fromMin, toMin, start, end, id: s.id }
     })
     .filter(Boolean)
     .sort((a, b) => a.fromMin - b.fromMin)
+
+  function minuteFromClientY(clientY) {
+    const el = timelineRef.current
+    if (!el) return 0
+    const rect = el.getBoundingClientRect()
+    const y = Math.min(Math.max(clientY - rect.top, 0), TIMELINE_HEIGHT)
+    const ratio = y / TIMELINE_HEIGHT
+    return Math.round(ratio * minutesInDay)
+  }
+
+  useEffect(() => {
+    if (!drag) return
+    function onMove(e) {
+      const currentMin = minuteFromClientY(e.clientY)
+      const delta = currentMin - drag.pointerMin0
+      let newFrom = drag.fromMin0
+      let newTo = drag.toMin0
+      if (drag.mode === 'move') {
+        newFrom = Math.max(0, Math.min(minutesInDay - (drag.toMin0 - drag.fromMin0), drag.fromMin0 + delta))
+        newTo = newFrom + (drag.toMin0 - drag.fromMin0)
+      } else if (drag.mode === 'resize-start') {
+        newFrom = Math.max(0, Math.min(drag.toMin0 - 1, drag.fromMin0 + delta))
+      } else if (drag.mode === 'resize-end') {
+        newTo = Math.min(minutesInDay, Math.max(drag.fromMin0 + 1, drag.toMin0 + delta))
+      }
+      setDrag((d) => (d ? { ...d, fromMin: newFrom, toMin: newTo } : d))
+    }
+    function onUp() {
+      setSessions((prev) => {
+        const idx = prev.findIndex((s) => s.id === drag.id)
+        if (idx === -1) return prev
+        const next = prev.slice()
+        const newStart = dayStart + (drag.fromMin * 60000)
+        const newEnd = dayStart + (drag.toMin * 60000)
+        next[idx] = {
+          ...next[idx],
+          start: newStart,
+          end: newEnd,
+          startDateIso: new Date(newStart).toISOString().slice(0, 10),
+          endDateIso: new Date(newEnd).toISOString().slice(0, 10)
+        }
+        return next
+      })
+      setDrag(null)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drag])
 
   function parseTimeToMs(timeStr) {
     // expects HH:MM (24h)
@@ -130,7 +200,7 @@ export default function App() {
     const endDateIso = new Date(end).toISOString().slice(0, 10)
     setSessions((prev) => [
       ...prev,
-      { start, end, startDateIso, endDateIso }
+      { id: `${start}-${end}-${Math.random().toString(36).slice(2, 8)}`, start, end, startDateIso, endDateIso }
     ])
     // Reset inputs
     setManualStart('')
@@ -292,7 +362,7 @@ export default function App() {
               padding: 16
             }}>
               <div style={{ textAlign: 'left', fontWeight: 600, marginBottom: 8 }}>Today’s Schedule</div>
-              <div style={{ position: 'relative', height: 960, overflow: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <div ref={timelineRef} style={{ position: 'relative', height: 960, overflow: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)', cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default' }}>
                 {/* Hour grid */}
                 {Array.from({ length: 25 }).map((_, i) => (
                   <div
@@ -329,7 +399,7 @@ export default function App() {
                   const label = `${new Date(b.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(b.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                   return (
                     <div
-                      key={idx}
+                      key={b.id || idx}
                       title={label}
                       style={{
                         position: 'absolute',
@@ -346,9 +416,30 @@ export default function App() {
                         padding: '6px 10px',
                         color: '#08324f',
                         fontSize: 12,
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        cursor: 'grab'
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        setDrag({ id: b.id, mode: 'move', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
                       }}
                     >
+                      {/* Resize handle - top */}
+                      <div
+                        onMouseDown={(e) => {
+                          e.preventDefault(); e.stopPropagation()
+                          setDrag({ id: b.id, mode: 'resize-start', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
+                        }}
+                        style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 8, cursor: 'ns-resize' }}
+                      />
+                      {/* Resize handle - bottom */}
+                      <div
+                        onMouseDown={(e) => {
+                          e.preventDefault(); e.stopPropagation()
+                          setDrag({ id: b.id, mode: 'resize-end', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
+                        }}
+                        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 8, cursor: 'ns-resize' }}
+                      />
                       <div style={{ fontWeight: 700, marginRight: 8 }}>Sleep</div>
                       <div style={{ opacity: 0.8 }}>
                         {label}
