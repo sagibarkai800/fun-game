@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
+import { generateSchedule, formatSchedule } from './sleepScheduler.js'
 
 export default function App() {
   const [isSleeping, setIsSleeping] = useState(false)
@@ -38,6 +39,27 @@ export default function App() {
       return 'months'
     }
   })
+  const [firstWakeTimeToday, setFirstWakeTimeToday] = useState(() => {
+    try {
+      const stored = localStorage.getItem('firstWakeTimeToday')
+      if (stored) {
+        const date = new Date(stored)
+        // Check if it's today
+        const today = new Date()
+        if (date.toDateString() === today.toDateString()) {
+          return date
+        }
+      }
+      // Default to 7:00 AM today
+      const defaultWake = new Date()
+      defaultWake.setHours(7, 0, 0, 0)
+      return defaultWake
+    } catch {
+      const defaultWake = new Date()
+      defaultWake.setHours(7, 0, 0, 0)
+      return defaultWake
+    }
+  })
 
   useEffect(() => {
     if (!isSleeping || !startAtMs) return
@@ -68,6 +90,12 @@ export default function App() {
       localStorage.setItem('ageUnit', ageUnit)
     } catch {}
   }, [babyAge, ageUnit])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('firstWakeTimeToday', firstWakeTimeToday.toISOString())
+    } catch {}
+  }, [firstWakeTimeToday])
 
   // Ensure sessions have stable ids (for editing)
   useEffect(() => {
@@ -145,6 +173,45 @@ export default function App() {
     })
     .filter(Boolean)
     .sort((a, b) => a.fromMin - b.fromMin)
+
+  // Calculate sleep schedule using algorithm
+  const schedule = useMemo(() => {
+    if (babyAge === null) return null
+    
+    // Convert age to months
+    let ageMonths = babyAge
+    if (ageUnit === 'weeks') {
+      ageMonths = Math.floor(babyAge / 4.33)
+    } else if (ageUnit === 'years') {
+      ageMonths = babyAge * 12
+    }
+    
+    // Get today's sessions to calculate actual nap durations
+    const todaySessions = sessions.filter(s => {
+      const sessionDate = new Date(s.start).toISOString().slice(0, 10)
+      return sessionDate === selectedDate
+    })
+    
+    // Calculate actual nap durations (in minutes)
+    const actualNapDurations = todaySessions.map(s => {
+      return Math.round((s.end - s.start) / 60000)
+    })
+    
+    // Generate schedule
+    try {
+      return generateSchedule({
+        babyAgeMonths: ageMonths,
+        firstWakeTimeToday: firstWakeTimeToday,
+        currentTime: currentTime,
+        actualNapDurations: actualNapDurations,
+        logs: [], // Could enhance this later
+        timezoneOrDSTChangeFlag: false, // Could detect this later
+      })
+    } catch (error) {
+      console.error('Error generating schedule:', error)
+      return null
+    }
+  }, [babyAge, ageUnit, firstWakeTimeToday, currentTime, sessions, selectedDate])
 
   function minuteFromClientY(clientY) {
     const el = timelineRef.current
@@ -250,6 +317,31 @@ export default function App() {
     <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] p-0 font-sans">
       <div className="w-[1000px] h-screen bg-[#cfe9ff] rounded-2xl shadow-lg flex flex-col items-stretch justify-start text-[#0b3d62] text-center p-6">
         <div className="w-full max-w-[920px] mx-auto">
+          {/* Next Nap Indicator */}
+          {schedule && schedule.scheduledNaps.length > 0 && (
+            <div className="mb-4 bg-gradient-to-r from-[#9fd2ff] to-[#74bfff] border border-black/10 rounded-xl p-4 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-[#08324f] mb-1">Next Nap</div>
+                  <div className="text-2xl font-bold text-[#0b3d62]">
+                    {schedule.scheduledNaps[0].startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                  <div className="text-sm text-[#2a5875] mt-1">
+                    Estimated duration: ~{Math.round(schedule.scheduledNaps[0].duration)} min
+                  </div>
+                </div>
+                {schedule.recommendedBedtime && (
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-[#08324f] mb-1">Bedtime</div>
+                    <div className="text-xl font-bold text-[#0b3d62]">
+                      {schedule.recommendedBedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="flex items-center justify-between gap-4">
             <div className="text-left">
               <h1 className="m-0 text-[1.75rem]">Baby Sleep Timer</h1>
@@ -286,6 +378,22 @@ export default function App() {
                     ({babyAge} {ageUnit})
                   </span>
                 )}
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-[#2a5875]">
+                  <span>First wake today:</span>
+                  <input
+                    type="time"
+                    value={firstWakeTimeToday.toTimeString().slice(0, 5)}
+                    onChange={(e) => {
+                      const [hours, minutes] = e.target.value.split(':').map(Number)
+                      const newWake = new Date(firstWakeTimeToday)
+                      newWake.setHours(hours, minutes, 0, 0)
+                      setFirstWakeTimeToday(newWake)
+                    }}
+                    className="px-2 py-1 rounded border border-black/10 text-sm"
+                  />
+                </label>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -452,6 +560,66 @@ export default function App() {
                       </div>
                     )
                   })}
+                  {/* Scheduled naps (only show for today) */}
+                  {schedule && schedule.scheduledNaps && selectedDate === todayIso && schedule.scheduledNaps.map((nap, idx) => {
+                    const napStart = new Date(nap.startTime)
+                    const napEnd = new Date(nap.endTime)
+                    // Check if nap is within the selected day
+                    if (napStart < new Date(dayStart) || napStart > new Date(dayEnd)) return null
+                    
+                    const start = Math.max(napStart.getTime(), dayStart)
+                    const end = Math.min(napEnd.getTime(), dayEnd)
+                    if (end <= start) return null
+                    
+                    const fromMin = Math.max(0, Math.floor((start - dayStart) / 60000))
+                    const toMin = Math.min(minutesInDay, Math.ceil((end - dayStart) / 60000))
+                    const topPct = (fromMin / minutesInDay) * 100
+                    const bottomPct = (toMin / minutesInDay) * 100
+                    const heightPct = Math.max(1.5, bottomPct - topPct)
+                    const label = `Scheduled Nap ${nap.napNumber}: ${napStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${napEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                    
+                    return (
+                      <div
+                        key={`scheduled-${idx}`}
+                        title={label}
+                        className="absolute left-[72px] right-3 bg-gradient-to-b from-[#ffd89b] to-[#ffb347] border-2 border-dashed border-[#ff9500] rounded-[10px] shadow-md flex items-center px-2.5 py-1.5 text-[#5a3a1a] text-xs overflow-hidden opacity-80"
+                        style={{
+                          top: `calc(${topPct}% + 2px)`,
+                          height: `calc(${heightPct}% - 4px)`
+                        }}
+                      >
+                        <div className="font-bold mr-2">Scheduled</div>
+                        <div className="opacity-80">
+                          {label}
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {/* Scheduled bedtime (only show for today) */}
+                  {schedule && schedule.recommendedBedtime && selectedDate === todayIso && (() => {
+                    const bedtime = new Date(schedule.recommendedBedtime)
+                    const nightEnd = new Date(bedtime.getTime() + schedule.nightSleepDuration * 60000)
+                    
+                    // Show bedtime marker
+                    const bedtimeMs = bedtime.getTime()
+                    if (bedtimeMs < dayStart || bedtimeMs > dayEnd) return null
+                    
+                    const bedtimeMin = Math.floor((bedtimeMs - dayStart) / 60000)
+                    const topPct = (bedtimeMin / minutesInDay) * 100
+                    
+                    return (
+                      <div
+                        key="bedtime-marker"
+                        className="absolute left-[72px] right-3 border-t-2 border-dashed border-[#ff6b6b]"
+                        style={{ top: `calc(${topPct}% + 2px)` }}
+                        title={`Recommended bedtime: ${bedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                      >
+                        <div className="absolute left-0 -top-2 bg-[#ff6b6b] text-white text-[10px] px-1.5 py-0.5 rounded font-semibold">
+                          Bedtime {bedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
               </div>
             </div>
