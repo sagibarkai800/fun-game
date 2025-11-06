@@ -14,6 +14,10 @@ export default function App() {
   })
   const todayIso = new Date().toISOString().slice(0, 10)
   const [selectedDate, setSelectedDate] = useState(todayIso)
+  const [manualStart, setManualStart] = useState('') // HH:MM
+  const [manualEnd, setManualEnd] = useState('') // HH:MM
+  const [endsNextDay, setEndsNextDay] = useState(false)
+  const [manualError, setManualError] = useState('')
 
   useEffect(() => {
     if (!isSleeping || !startAtMs) return
@@ -93,6 +97,46 @@ export default function App() {
     })
     .filter(Boolean)
     .sort((a, b) => a.fromMin - b.fromMin)
+
+  function parseTimeToMs(timeStr) {
+    // expects HH:MM (24h)
+    const m = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(timeStr || '')
+    if (!m) return null
+    const hh = parseInt(m[1], 10)
+    const mm = parseInt(m[2], 10)
+    return (hh * 60 + mm) * 60000
+  }
+
+  function handleAddManual() {
+    setManualError('')
+    const startOffsetMs = parseTimeToMs(manualStart)
+    const endOffsetMs = parseTimeToMs(manualEnd)
+    if (startOffsetMs == null || endOffsetMs == null) {
+      setManualError('Please enter valid times as HH:MM')
+      return
+    }
+    let start = dayStart + startOffsetMs
+    let end = dayStart + endOffsetMs
+    if (endsNextDay) {
+      if (end <= start) end += 24 * 60 * 60000
+    } else {
+      if (end <= start) {
+        setManualError('End must be after start (or enable Ends next day)')
+        return
+      }
+    }
+    // Add
+    const startDateIso = new Date(start).toISOString().slice(0, 10)
+    const endDateIso = new Date(end).toISOString().slice(0, 10)
+    setSessions((prev) => [
+      ...prev,
+      { start, end, startDateIso, endDateIso }
+    ])
+    // Reset inputs
+    setManualStart('')
+    setManualEnd('')
+    setEndsNextDay(false)
+  }
 
   return (
     <div style={{
@@ -184,6 +228,58 @@ export default function App() {
                 >
                   {isSleeping ? 'Stop sleep' : 'Start sleep'}
                 </button>
+              </div>
+
+              <div style={{ marginTop: 20, textAlign: 'left' }}>
+                <div style={{ fontWeight: 600, marginBottom: 8 }}>Add sleep manually</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 13, color: '#2a5875' }}>Start</span>
+                    <input
+                      type="time"
+                      value={manualStart}
+                      onChange={(e) => setManualStart(e.target.value)}
+                      style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                    />
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 13, color: '#2a5875' }}>End</span>
+                    <input
+                      type="time"
+                      value={manualEnd}
+                      onChange={(e) => setManualEnd(e.target.value)}
+                      style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                    />
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <input
+                      type="checkbox"
+                      checked={endsNextDay}
+                      onChange={(e) => setEndsNextDay(e.target.checked)}
+                    />
+                    <span style={{ fontSize: 13, color: '#2a5875' }}>Ends next day</span>
+                  </label>
+                  <button
+                    onClick={handleAddManual}
+                    style={{
+                      appearance: 'none',
+                      border: 'none',
+                      padding: '10px 16px',
+                      borderRadius: 10,
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      background: '#1f8ad1',
+                      boxShadow: '0 6px 16px rgba(0,0,0,0.12)'
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+                {manualError ? (
+                  <div style={{ marginTop: 8, color: '#b23b3b', fontSize: 13 }}>{manualError}</div>
+                ) : null}
               </div>
             </div>
 
