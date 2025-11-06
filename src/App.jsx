@@ -314,43 +314,22 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] p-0 font-sans">
-      <div className="w-[1000px] h-screen bg-[#cfe9ff] rounded-2xl shadow-lg flex flex-col items-stretch justify-start text-[#0b3d62] text-center p-6">
-        <div className="w-full max-w-[920px] mx-auto">
-          {/* Next Nap Indicator */}
-          {schedule && schedule.scheduledNaps.length > 0 && (
-            <div className="mb-4 bg-gradient-to-r from-[#9fd2ff] to-[#74bfff] border border-black/10 rounded-xl p-4 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-semibold text-[#08324f] mb-1">Next Nap</div>
-                  <div className="text-2xl font-bold text-[#0b3d62]">
-                    {schedule.scheduledNaps[0].startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                  <div className="text-sm text-[#2a5875] mt-1">
-                    Estimated duration: ~{Math.round(schedule.scheduledNaps[0].duration)} min
-                  </div>
-                </div>
-                {schedule.recommendedBedtime && (
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-[#08324f] mb-1">Bedtime</div>
-                    <div className="text-xl font-bold text-[#0b3d62]">
-                      {schedule.recommendedBedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-left">
-              <h1 className="m-0 text-[1.75rem]">Baby Sleep Timer</h1>
-              <div className="mt-1 text-[#336b8f]">
-                Press the button to start or stop sleep time
-              </div>
-              <div className="mt-3 flex items-center gap-2">
-                <label className="flex items-center gap-2 text-sm text-[#2a5875]">
-                  <span>Baby age:</span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 font-sans">
+      <div className="w-full max-w-6xl h-screen max-h-[900px] bg-white rounded-3xl shadow-2xl flex flex-col items-stretch justify-start text-slate-800 p-8 overflow-hidden">
+        <div className="w-full mx-auto">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-6 mb-6">
+            <div className="flex-1">
+              <h1 className="m-0 text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Baby Sleep Timer
+              </h1>
+              <p className="mt-2 text-slate-600 text-sm">
+                Track and schedule your baby's sleep patterns
+              </p>
+              
+              <div className="mt-4 flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-slate-700">Baby age:</label>
                   <input
                     type="number"
                     min="0"
@@ -361,27 +340,25 @@ export default function App() {
                       setBabyAge(val)
                     }}
                     placeholder="Age"
-                    className="w-16 px-2 py-1 rounded border border-black/10 text-sm"
+                    className="w-20 px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                   <select
                     value={ageUnit}
                     onChange={(e) => setAgeUnit(e.target.value)}
-                    className="px-2 py-1 rounded border border-black/10 text-sm"
+                    className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   >
                     <option value="weeks">weeks</option>
                     <option value="months">months</option>
                     <option value="years">years</option>
                   </select>
-                </label>
-                {babyAge !== null && (
-                  <span className="text-sm text-[#336b8f]">
-                    ({babyAge} {ageUnit})
-                  </span>
-                )}
-              </div>
-              <div className="mt-2 flex items-center gap-2">
-                <label className="flex items-center gap-2 text-sm text-[#2a5875]">
-                  <span>First wake today:</span>
+                  {babyAge !== null && (
+                    <span className="text-sm text-slate-500 font-medium">
+                      ({babyAge} {ageUnit})
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-slate-700">First wake:</label>
                   <input
                     type="time"
                     value={firstWakeTimeToday.toTimeString().slice(0, 5)}
@@ -391,89 +368,134 @@ export default function App() {
                       newWake.setHours(hours, minutes, 0, 0)
                       setFirstWakeTimeToday(newWake)
                     }}
-                    className="px-2 py-1 rounded border border-black/10 text-sm"
+                    className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
-                </label>
+                </div>
               </div>
             </div>
+            
             <div className="flex items-center gap-3">
-              <div className="bg-white/60 border border-black/10 rounded-[10px] px-3.5 py-2.5 text-lg font-semibold text-[#0b3d62] min-w-[100px] text-center">
-                {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl px-4 py-3 shadow-lg">
+                <div className="text-xs font-medium opacity-90 mb-1">Current Time</div>
+                <div className="text-xl font-bold tabular-nums">
+                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </div>
               </div>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="px-3.5 py-2.5 rounded-[10px] border border-black/10 text-[0.95rem]"
+                className="px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col gap-4">
-            <div className="w-full bg-white/60 border border-black/6 rounded-[14px] p-4">
-              <div className="text-5xl font-bold tracking-wider">
-                {formatDuration(displayMs)}
+          {/* Next Nap Indicator */}
+          {schedule && schedule.scheduledNaps.length > 0 && (
+            <div className="mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-6 shadow-xl text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium opacity-90 mb-2">Next Nap</div>
+                  <div className="text-4xl font-bold mb-1">
+                    {schedule.scheduledNaps[0].startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                  <div className="text-sm opacity-80">
+                    Estimated duration: ~{Math.round(schedule.scheduledNaps[0].duration)} min
+                  </div>
+                </div>
+                {schedule.recommendedBedtime && (
+                  <div className="text-right">
+                    <div className="text-sm font-medium opacity-90 mb-2">Bedtime</div>
+                    <div className="text-3xl font-bold">
+                      {schedule.recommendedBedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="mt-3 text-[#2a5875]">
-                Status: {isSleeping ? 'Sleeping…' : 'Stopped'}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-6 overflow-y-auto flex-1">
+            <div className="w-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <div className="text-center mb-6">
+                <div className="text-6xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                  {formatDuration(displayMs)}
+                </div>
+                <div className="text-sm font-medium text-slate-600">
+                  {isSleeping ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                      Sleeping…
+                    </span>
+                  ) : (
+                    'Stopped'
+                  )}
+                </div>
               </div>
-              <div className="mt-4">
+              
+              <div className="flex justify-center">
                 <button
                   onClick={handleToggle}
-                  className={`appearance-none border-none px-6 py-3.5 rounded-full text-[1.05rem] font-semibold text-white cursor-pointer shadow-lg transition-all duration-75 hover:scale-[0.98] active:scale-[0.98] ${
-                    isSleeping ? 'bg-[#e75b5b]' : 'bg-[#2bb673]'
+                  className={`px-8 py-4 rounded-2xl text-lg font-semibold text-white cursor-pointer shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
+                    isSleeping 
+                      ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700' 
+                      : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
                   }`}
                 >
-                  {isSleeping ? 'Stop sleep' : 'Start sleep'}
+                  {isSleeping ? '⏸ Stop Sleep' : '▶ Start Sleep'}
                 </button>
               </div>
 
-              <div className="mt-5 text-left">
-                <div className="font-semibold mb-2">Add sleep manually</div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <label className="flex items-center gap-1.5">
-                    <span className="text-[13px] text-[#2a5875]">Start</span>
+              <div className="mt-6 pt-6 border-t border-slate-200">
+                <div className="font-semibold text-slate-800 mb-3">Add Sleep Manually</div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <label className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">Start</span>
                     <input
                       type="time"
                       value={manualStart}
                       onChange={(e) => setManualStart(e.target.value)}
-                      className="px-2.5 py-2 rounded-lg border border-black/10"
+                      className="px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </label>
-                  <label className="flex items-center gap-1.5">
-                    <span className="text-[13px] text-[#2a5875]">End</span>
+                  <label className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">End</span>
                     <input
                       type="time"
                       value={manualEnd}
                       onChange={(e) => setManualEnd(e.target.value)}
-                      className="px-2.5 py-2 rounded-lg border border-black/10"
+                      className="px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </label>
-                  <label className="flex items-center gap-1.5">
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={endsNextDay}
                       onChange={(e) => setEndsNextDay(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                     />
-                    <span className="text-[13px] text-[#2a5875]">Ends next day</span>
+                    <span className="text-sm text-slate-700">Ends next day</span>
                   </label>
                   <button
                     onClick={handleAddManual}
-                    className="appearance-none border-none px-4 py-2.5 rounded-[10px] text-[0.95rem] font-semibold text-white cursor-pointer bg-[#1f8ad1] shadow-lg"
+                    className="px-5 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-md transition-all duration-200"
                   >
                     Add
                   </button>
                 </div>
                 {manualError ? (
-                  <div className="mt-2 text-[#b23b3b] text-[13px]">{manualError}</div>
+                  <div className="mt-3 text-red-600 text-sm font-medium bg-red-50 px-3 py-2 rounded-lg">{manualError}</div>
                 ) : null}
               </div>
             </div>
 
-            <div className="w-full bg-white/60 border border-black/6 rounded-[14px] p-4">
-              <div className="text-left font-semibold mb-2">Today's Schedule</div>
+            <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <div className="text-left mb-4">
+                <h2 className="text-xl font-bold text-slate-800 mb-1">Today's Schedule</h2>
+                <p className="text-sm text-slate-600">View and manage sleep sessions</p>
+              </div>
               <div 
-                className="overflow-y-auto overflow-x-hidden rounded-[10px] bg-[#eef6ff] border border-black/6"
+                className="overflow-y-auto overflow-x-hidden rounded-xl bg-gradient-to-b from-slate-50 to-blue-50 border border-slate-200 shadow-inner"
                 style={{ height: TIMELINE_HEIGHT }}
               >
                 <div 
@@ -488,7 +510,7 @@ export default function App() {
                   {Array.from({ length: 25 }).map((_, i) => (
                     <div
                       key={i}
-                      className="absolute left-0 right-0 border-t border-dashed border-black/8"
+                      className="absolute left-0 right-0 border-t border-dashed border-slate-300/50"
                       style={{ top: `${(i / 24) * 100}%` }}
                     />
                   ))}
@@ -496,7 +518,7 @@ export default function App() {
                   {Array.from({ length: 24 }).map((_, i) => (
                     <div
                       key={`label-${i}`}
-                      className="absolute left-2 text-xs text-[#2a5875]"
+                      className="absolute left-3 text-xs font-medium text-slate-600"
                       style={{ top: `calc(${(i / 24) * 100}% - 8px)` }}
                     >
                       {String(i).padStart(2, '0')}:00
@@ -512,7 +534,7 @@ export default function App() {
                       <div
                         key={b.id || idx}
                         title={label}
-                        className="absolute left-[72px] right-3 bg-gradient-to-b from-[#9fd2ff] to-[#74bfff] border border-black/8 rounded-[10px] shadow-lg flex items-center px-2.5 py-1.5 text-[#08324f] text-xs overflow-hidden cursor-grab"
+                        className="absolute left-[72px] right-3 bg-gradient-to-br from-indigo-400 to-purple-500 border border-indigo-300/50 rounded-xl shadow-md flex items-center px-3 py-2 text-white text-xs overflow-hidden cursor-grab hover:shadow-lg transition-shadow"
                         style={{
                           top: `calc(${topPct}% + 2px)`,
                           height: `calc(${heightPct}% - 4px)`
@@ -528,7 +550,7 @@ export default function App() {
                             e.preventDefault(); e.stopPropagation()
                             setDrag({ id: b.id, mode: 'resize-start', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
                           }}
-                          className="absolute left-0 right-0 top-0 h-2 cursor-ns-resize"
+                          className="absolute left-0 right-0 top-0 h-2 cursor-ns-resize hover:bg-white/20"
                         />
                         {/* Resize handle - bottom */}
                         <div
@@ -536,10 +558,10 @@ export default function App() {
                             e.preventDefault(); e.stopPropagation()
                             setDrag({ id: b.id, mode: 'resize-end', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
                           }}
-                          className="absolute left-0 right-0 bottom-0 h-2 cursor-ns-resize"
+                          className="absolute left-0 right-0 bottom-0 h-2 cursor-ns-resize hover:bg-white/20"
                         />
-                        <div className="font-bold mr-2">Sleep</div>
-                        <div className="opacity-80">
+                        <div className="font-bold mr-2">💤 Sleep</div>
+                        <div className="opacity-90">
                           {label}
                         </div>
                         <button
@@ -552,7 +574,7 @@ export default function App() {
                             e.preventDefault()
                             e.stopPropagation()
                           }}
-                          className="absolute top-1 right-1 appearance-none border-none bg-white/70 rounded-full w-5 h-5 flex items-center justify-center cursor-pointer text-sm text-[#b23b3b] font-bold p-0 leading-none transition-colors duration-200 z-10 hover:bg-white/90"
+                          className="absolute top-1.5 right-1.5 appearance-none border-none bg-white/90 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer text-sm text-red-600 font-bold p-0 leading-none transition-all duration-200 z-10 hover:bg-white hover:scale-110"
                           title="Delete sleep session"
                         >
                           ×
@@ -582,15 +604,15 @@ export default function App() {
                       <div
                         key={`scheduled-${idx}`}
                         title={label}
-                        className="absolute left-[72px] right-3 bg-gradient-to-b from-[#ffd89b] to-[#ffb347] border-2 border-dashed border-[#ff9500] rounded-[10px] shadow-md flex items-center px-2.5 py-1.5 text-[#5a3a1a] text-xs overflow-hidden opacity-80"
+                        className="absolute left-[72px] right-3 bg-gradient-to-br from-amber-300 to-orange-400 border-2 border-dashed border-amber-500 rounded-xl shadow-md flex items-center px-3 py-2 text-amber-900 text-xs overflow-hidden opacity-85"
                         style={{
                           top: `calc(${topPct}% + 2px)`,
                           height: `calc(${heightPct}% - 4px)`
                         }}
                       >
-                        <div className="font-bold mr-2">Scheduled</div>
-                        <div className="opacity-80">
-                          {label}
+                        <div className="font-bold mr-2">📅 Scheduled</div>
+                        <div className="opacity-90">
+                          {napStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {napEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     )
@@ -610,12 +632,12 @@ export default function App() {
                     return (
                       <div
                         key="bedtime-marker"
-                        className="absolute left-[72px] right-3 border-t-2 border-dashed border-[#ff6b6b]"
+                        className="absolute left-[72px] right-3 border-t-2 border-dashed border-rose-500"
                         style={{ top: `calc(${topPct}% + 2px)` }}
                         title={`Recommended bedtime: ${bedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                       >
-                        <div className="absolute left-0 -top-2 bg-[#ff6b6b] text-white text-[10px] px-1.5 py-0.5 rounded font-semibold">
-                          Bedtime {bedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <div className="absolute left-0 -top-2.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-[10px] px-2 py-1 rounded-lg font-semibold shadow-md">
+                          🌙 Bedtime {bedtime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     )
