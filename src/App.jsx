@@ -21,6 +21,7 @@ export default function App() {
   const timelineRef = useRef(null)
   const [drag, setDrag] = useState(null) // { id, mode, fromMin0, toMin0, pointerMin0, fromMin, toMin }
   const TIMELINE_HEIGHT = 480
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
     if (!isSleeping || !startAtMs) return
@@ -29,6 +30,13 @@ export default function App() {
     }, 500)
     return () => clearInterval(id)
   }, [isSleeping, startAtMs])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     try {
@@ -209,6 +217,10 @@ export default function App() {
     setEndsNextDay(false)
   }
 
+  function handleDeleteSession(sessionId) {
+    setSessions((prev) => prev.filter((s) => s.id !== sessionId))
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -241,7 +253,20 @@ export default function App() {
                 Press the button to start or stop sleep time
               </div>
             </div>
-            <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.6)',
+                border: '1px solid rgba(0,0,0,0.1)',
+                borderRadius: 10,
+                padding: '10px 14px',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                color: '#0b3d62',
+                minWidth: 100,
+                textAlign: 'center'
+              }}>
+                {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </div>
               <input
                 type="date"
                 value={selectedDate}
@@ -446,6 +471,48 @@ export default function App() {
                       <div style={{ opacity: 0.8 }}>
                         {label}
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleDeleteSession(b.id)
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: 4,
+                          right: 4,
+                          appearance: 'none',
+                          border: 'none',
+                          background: 'rgba(255, 255, 255, 0.7)',
+                          borderRadius: '50%',
+                          width: 20,
+                          height: 20,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          fontSize: 14,
+                          color: '#b23b3b',
+                          fontWeight: 'bold',
+                          padding: 0,
+                          lineHeight: 1,
+                          transition: 'background 0.2s ease',
+                          zIndex: 10
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.7)'
+                        }}
+                        title="Delete sleep session"
+                      >
+                        ×
+                      </button>
                     </div>
                   )
                 })}
