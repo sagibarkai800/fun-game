@@ -315,8 +315,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 font-sans">
-      <div className="w-full max-w-6xl h-screen max-h-[900px] bg-white rounded-3xl shadow-2xl flex flex-col items-stretch justify-start text-slate-800 p-8 overflow-hidden">
-        <div className="w-full mx-auto">
+      <div className="w-full max-w-6xl h-screen bg-white rounded-3xl shadow-2xl flex flex-col items-stretch justify-start text-slate-800 p-8 overflow-hidden">
+        <div className="w-full mx-auto flex flex-col h-full min-h-0">
           {/* Header */}
           <div className="flex items-start justify-between gap-6 mb-6">
             <div className="flex-1">
@@ -415,88 +415,86 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex flex-col gap-6 overflow-y-auto flex-1">
-            <div className="w-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl p-6 shadow-sm">
-              <div className="text-center mb-6">
-                <div className="text-6xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                  {formatDuration(displayMs)}
+          <div className="flex flex-col gap-4 flex-1 min-h-0">
+            <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold tracking-tight text-slate-700">
+                      {formatDuration(displayMs)}
+                    </div>
+                    <div className="text-xs font-medium text-slate-500 mt-1">
+                      {isSleeping ? (
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                          Sleeping
+                        </span>
+                      ) : (
+                        'Stopped'
+                      )}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={handleToggle}
+                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer shadow-md transition-all duration-200 hover:scale-105 active:scale-95 ${
+                      isSleeping 
+                        ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700' 
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
+                    }`}
+                  >
+                    {isSleeping ? '⏸ Stop' : '▶ Start'}
+                  </button>
                 </div>
-                <div className="text-sm font-medium text-slate-600">
-                  {isSleeping ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      Sleeping…
-                    </span>
-                  ) : (
-                    'Stopped'
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex justify-center">
-                <button
-                  onClick={handleToggle}
-                  className={`px-8 py-4 rounded-2xl text-lg font-semibold text-white cursor-pointer shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
-                    isSleeping 
-                      ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700' 
-                      : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
-                  }`}
-                >
-                  {isSleeping ? '⏸ Stop Sleep' : '▶ Start Sleep'}
-                </button>
-              </div>
 
-              <div className="mt-6 pt-6 border-t border-slate-200">
-                <div className="font-semibold text-slate-800 mb-3">Add Sleep Manually</div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <label className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-700">Start</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <label className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-slate-600">Start</span>
                     <input
                       type="time"
                       value={manualStart}
                       onChange={(e) => setManualStart(e.target.value)}
-                      className="px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="px-2 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </label>
-                  <label className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-700">End</span>
+                  <label className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-slate-600">End</span>
                     <input
                       type="time"
                       value={manualEnd}
                       onChange={(e) => setManualEnd(e.target.value)}
-                      className="px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="px-2 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={endsNextDay}
                       onChange={(e) => setEndsNextDay(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                      className="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"
                     />
-                    <span className="text-sm text-slate-700">Ends next day</span>
+                    <span className="text-xs text-slate-600">Next day</span>
                   </label>
                   <button
                     onClick={handleAddManual}
-                    className="px-5 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-md transition-all duration-200"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-sm transition-all duration-200"
                   >
                     Add
                   </button>
                 </div>
-                {manualError ? (
-                  <div className="mt-3 text-red-600 text-sm font-medium bg-red-50 px-3 py-2 rounded-lg">{manualError}</div>
-                ) : null}
               </div>
+              {manualError ? (
+                <div className="mt-3 text-red-600 text-xs font-medium bg-red-50 px-2 py-1.5 rounded-lg">{manualError}</div>
+              ) : null}
             </div>
 
-            <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-              <div className="text-left mb-4">
-                <h2 className="text-xl font-bold text-slate-800 mb-1">Today's Schedule</h2>
+            <div className="w-full bg-white border-2 border-indigo-200 rounded-2xl p-6 shadow-xl flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="text-left mb-4 flex-shrink-0">
+                <h2 className="text-2xl font-bold text-slate-800 mb-1">Today's Schedule</h2>
                 <p className="text-sm text-slate-600">View and manage sleep sessions</p>
               </div>
               <div 
-                className="overflow-y-auto overflow-x-hidden rounded-xl bg-gradient-to-b from-slate-50 to-blue-50 border border-slate-200 shadow-inner"
-                style={{ height: TIMELINE_HEIGHT }}
+                className="overflow-y-auto overflow-x-hidden rounded-xl bg-gradient-to-b from-slate-50 to-blue-50 border-2 border-slate-200 shadow-inner flex-1 min-h-0"
               >
                 <div 
                   ref={timelineRef} 
