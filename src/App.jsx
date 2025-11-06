@@ -361,38 +361,39 @@ export default function App() {
               borderRadius: 14,
               padding: 16
             }}>
-              <div style={{ textAlign: 'left', fontWeight: 600, marginBottom: 8 }}>Today’s Schedule</div>
-              <div ref={timelineRef} style={{ position: 'relative', height: TIMELINE_HEIGHT, overflowY: 'auto', overflowX: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)', cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default' }}>
-                {/* Hour grid */}
-                {Array.from({ length: 25 }).map((_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      position: 'absolute',
-                      top: `${(i / 24) * 100}%`,
-                      left: 0,
-                      right: 0,
-                      borderTop: '1px dashed rgba(0,0,0,0.08)'
-                    }}
-                  />
-                ))}
-                {/* Hour labels */}
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <div
-                    key={`label-${i}`}
-                    style={{
-                      position: 'absolute',
-                      top: `calc(${(i / 24) * 100}% - 8px)`,
-                      left: 8,
-                      fontSize: 12,
-                      color: '#2a5875'
-                    }}
-                  >
-                    {String(i).padStart(2, '0')}:00
-                  </div>
-                ))}
-                {/* Sleep blocks */}
-                {dayBlocks.map((b, idx) => {
+              <div style={{ textAlign: 'left', fontWeight: 600, marginBottom: 8 }}>Today's Schedule</div>
+              <div style={{ height: TIMELINE_HEIGHT, overflowY: 'auto', overflowX: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)' }}>
+                <div ref={timelineRef} style={{ position: 'relative', height: 960, cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default' }}>
+                  {/* Hour grid */}
+                  {Array.from({ length: 25 }).map((_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        position: 'absolute',
+                        top: `${(i / 24) * 100}%`,
+                        left: 0,
+                        right: 0,
+                        borderTop: '1px dashed rgba(0,0,0,0.08)'
+                      }}
+                    />
+                  ))}
+                  {/* Hour labels */}
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <div
+                      key={`label-${i}`}
+                      style={{
+                        position: 'absolute',
+                        top: `calc(${(i / 24) * 100}% - 8px)`,
+                        left: 8,
+                        fontSize: 12,
+                        color: '#2a5875'
+                      }}
+                    >
+                      {String(i).padStart(2, '0')}:00
+                    </div>
+                  ))}
+                  {/* Sleep blocks */}
+                  {dayBlocks.map((b, idx) => {
                   const topPct = (b.fromMin / minutesInDay) * 100
                   const bottomPct = (b.toMin / minutesInDay) * 100
                   const heightPct = Math.max(1.5, bottomPct - topPct)
