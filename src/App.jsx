@@ -22,6 +22,22 @@ export default function App() {
   const [drag, setDrag] = useState(null) // { id, mode, fromMin0, toMin0, pointerMin0, fromMin, toMin }
   const TIMELINE_HEIGHT = 480
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [babyAge, setBabyAge] = useState(() => {
+    try {
+      const stored = localStorage.getItem('babyAge')
+      return stored ? parseInt(stored, 10) : null
+    } catch {
+      return null
+    }
+  })
+  const [ageUnit, setAgeUnit] = useState(() => {
+    try {
+      const stored = localStorage.getItem('ageUnit')
+      return stored || 'months'
+    } catch {
+      return 'months'
+    }
+  })
 
   useEffect(() => {
     if (!isSleeping || !startAtMs) return
@@ -43,6 +59,15 @@ export default function App() {
       localStorage.setItem('sleepSessions', JSON.stringify(sessions))
     } catch {}
   }, [sessions])
+
+  useEffect(() => {
+    try {
+      if (babyAge !== null) {
+        localStorage.setItem('babyAge', String(babyAge))
+      }
+      localStorage.setItem('ageUnit', ageUnit)
+    } catch {}
+  }, [babyAge, ageUnit])
 
   // Ensure sessions have stable ids (for editing)
   useEffect(() => {
@@ -230,6 +255,37 @@ export default function App() {
               <h1 className="m-0 text-[1.75rem]">Baby Sleep Timer</h1>
               <div className="mt-1 text-[#336b8f]">
                 Press the button to start or stop sleep time
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-[#2a5875]">
+                  <span>Baby age:</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max={ageUnit === 'weeks' ? 52 : ageUnit === 'months' ? 24 : 6}
+                    value={babyAge || ''}
+                    onChange={(e) => {
+                      const val = e.target.value === '' ? null : parseInt(e.target.value, 10)
+                      setBabyAge(val)
+                    }}
+                    placeholder="Age"
+                    className="w-16 px-2 py-1 rounded border border-black/10 text-sm"
+                  />
+                  <select
+                    value={ageUnit}
+                    onChange={(e) => setAgeUnit(e.target.value)}
+                    className="px-2 py-1 rounded border border-black/10 text-sm"
+                  >
+                    <option value="weeks">weeks</option>
+                    <option value="months">months</option>
+                    <option value="years">years</option>
+                  </select>
+                </label>
+                {babyAge !== null && (
+                  <span className="text-sm text-[#336b8f]">
+                    ({babyAge} {ageUnit})
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
