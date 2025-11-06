@@ -222,300 +222,180 @@ export default function App() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
-      backgroundColor: '#f7f9fc',
-      padding: 0
-    }}>
-      <div style={{
-        width: '1000px',
-        height: '100vh',
-        backgroundColor: '#cfe9ff',
-        borderRadius: '16px',
-        boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        justifyContent: 'flex-start',
-        color: '#0b3d62',
-        textAlign: 'center',
-        padding: '24px'
-      }}>
-        <div style={{ width: '100%', maxWidth: 920, margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-            <div style={{ textAlign: 'left' }}>
-              <h1 style={{ margin: 0, fontSize: '1.75rem' }}>Baby Sleep Timer</h1>
-              <div style={{ marginTop: 4, color: '#336b8f' }}>
+    <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] p-0 font-sans">
+      <div className="w-[1000px] h-screen bg-[#cfe9ff] rounded-2xl shadow-lg flex flex-col items-stretch justify-start text-[#0b3d62] text-center p-6">
+        <div className="w-full max-w-[920px] mx-auto">
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-left">
+              <h1 className="m-0 text-[1.75rem]">Baby Sleep Timer</h1>
+              <div className="mt-1 text-[#336b8f]">
                 Press the button to start or stop sleep time
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.6)',
-                border: '1px solid rgba(0,0,0,0.1)',
-                borderRadius: 10,
-                padding: '10px 14px',
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                color: '#0b3d62',
-                minWidth: 100,
-                textAlign: 'center'
-              }}>
+            <div className="flex items-center gap-3">
+              <div className="bg-white/60 border border-black/10 rounded-[10px] px-3.5 py-2.5 text-lg font-semibold text-[#0b3d62] min-w-[100px] text-center">
                 {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </div>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  border: '1px solid rgba(0,0,0,0.1)',
-                  fontSize: '0.95rem'
-                }}
+                className="px-3.5 py-2.5 rounded-[10px] border border-black/10 text-[0.95rem]"
               />
             </div>
           </div>
 
-          <div style={{
-            marginTop: 20,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-            flexWrap: 'wrap'
-          }}>
-            <div style={{
-              flex: '1 1 360px',
-              minWidth: 320,
-              background: 'rgba(255,255,255,0.6)',
-              border: '1px solid rgba(0,0,0,0.06)',
-              borderRadius: 14,
-              padding: 16
-            }}>
-              <div style={{ fontSize: '3rem', fontWeight: 700, letterSpacing: '0.05em' }}>
+          <div className="mt-5 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-[320px] bg-white/60 border border-black/6 rounded-[14px] p-4">
+              <div className="text-5xl font-bold tracking-wider">
                 {formatDuration(displayMs)}
               </div>
-              <div style={{ marginTop: 12, color: '#2a5875' }}>
+              <div className="mt-3 text-[#2a5875]">
                 Status: {isSleeping ? 'Sleeping…' : 'Stopped'}
               </div>
-              <div style={{ marginTop: 16 }}>
+              <div className="mt-4">
                 <button
                   onClick={handleToggle}
-                  style={{
-                    appearance: 'none',
-                    border: 'none',
-                    padding: '14px 24px',
-                    borderRadius: '999px',
-                    fontSize: '1.05rem',
-                    fontWeight: 600,
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    boxShadow: '0 10px 24px rgba(0,0,0,0.12)',
-                    background: isSleeping ? '#e75b5b' : '#2bb673',
-                    transition: 'transform 0.08s ease, box-shadow 0.2s ease'
-                  }}
-                  onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-                  onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                  className={`appearance-none border-none px-6 py-3.5 rounded-full text-[1.05rem] font-semibold text-white cursor-pointer shadow-lg transition-all duration-75 hover:scale-[0.98] active:scale-[0.98] ${
+                    isSleeping ? 'bg-[#e75b5b]' : 'bg-[#2bb673]'
+                  }`}
                 >
                   {isSleeping ? 'Stop sleep' : 'Start sleep'}
                 </button>
               </div>
 
-              <div style={{ marginTop: 20, textAlign: 'left' }}>
-                <div style={{ fontWeight: 600, marginBottom: 8 }}>Add sleep manually</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 13, color: '#2a5875' }}>Start</span>
+              <div className="mt-5 text-left">
+                <div className="font-semibold mb-2">Add sleep manually</div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <label className="flex items-center gap-1.5">
+                    <span className="text-[13px] text-[#2a5875]">Start</span>
                     <input
                       type="time"
                       value={manualStart}
                       onChange={(e) => setManualStart(e.target.value)}
-                      style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                      className="px-2.5 py-2 rounded-lg border border-black/10"
                     />
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 13, color: '#2a5875' }}>End</span>
+                  <label className="flex items-center gap-1.5">
+                    <span className="text-[13px] text-[#2a5875]">End</span>
                     <input
                       type="time"
                       value={manualEnd}
                       onChange={(e) => setManualEnd(e.target.value)}
-                      style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                      className="px-2.5 py-2 rounded-lg border border-black/10"
                     />
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <label className="flex items-center gap-1.5">
                     <input
                       type="checkbox"
                       checked={endsNextDay}
                       onChange={(e) => setEndsNextDay(e.target.checked)}
                     />
-                    <span style={{ fontSize: 13, color: '#2a5875' }}>Ends next day</span>
+                    <span className="text-[13px] text-[#2a5875]">Ends next day</span>
                   </label>
                   <button
                     onClick={handleAddManual}
-                    style={{
-                      appearance: 'none',
-                      border: 'none',
-                      padding: '10px 16px',
-                      borderRadius: 10,
-                      fontSize: '0.95rem',
-                      fontWeight: 600,
-                      color: '#ffffff',
-                      cursor: 'pointer',
-                      background: '#1f8ad1',
-                      boxShadow: '0 6px 16px rgba(0,0,0,0.12)'
-                    }}
+                    className="appearance-none border-none px-4 py-2.5 rounded-[10px] text-[0.95rem] font-semibold text-white cursor-pointer bg-[#1f8ad1] shadow-lg"
                   >
                     Add
                   </button>
                 </div>
                 {manualError ? (
-                  <div style={{ marginTop: 8, color: '#b23b3b', fontSize: 13 }}>{manualError}</div>
+                  <div className="mt-2 text-[#b23b3b] text-[13px]">{manualError}</div>
                 ) : null}
               </div>
             </div>
 
-            <div style={{
-              flex: '2 1 520px',
-              minWidth: 420,
-              background: 'rgba(255,255,255,0.6)',
-              border: '1px solid rgba(0,0,0,0.06)',
-              borderRadius: 14,
-              padding: 16
-            }}>
-              <div style={{ textAlign: 'left', fontWeight: 600, marginBottom: 8 }}>Today's Schedule</div>
-              <div style={{ height: TIMELINE_HEIGHT, overflowY: 'auto', overflowX: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)' }}>
-                <div ref={timelineRef} style={{ position: 'relative', height: 960, cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default' }}>
+            <div className="flex-[2] min-w-[420px] bg-white/60 border border-black/6 rounded-[14px] p-4">
+              <div className="text-left font-semibold mb-2">Today's Schedule</div>
+              <div 
+                className="overflow-y-auto overflow-x-hidden rounded-[10px] bg-[#eef6ff] border border-black/6"
+                style={{ height: TIMELINE_HEIGHT }}
+              >
+                <div 
+                  ref={timelineRef} 
+                  className="relative"
+                  style={{ 
+                    height: 960,
+                    cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default'
+                  }}
+                >
                   {/* Hour grid */}
                   {Array.from({ length: 25 }).map((_, i) => (
                     <div
                       key={i}
-                      style={{
-                        position: 'absolute',
-                        top: `${(i / 24) * 100}%`,
-                        left: 0,
-                        right: 0,
-                        borderTop: '1px dashed rgba(0,0,0,0.08)'
-                      }}
+                      className="absolute left-0 right-0 border-t border-dashed border-black/8"
+                      style={{ top: `${(i / 24) * 100}%` }}
                     />
                   ))}
                   {/* Hour labels */}
                   {Array.from({ length: 24 }).map((_, i) => (
                     <div
                       key={`label-${i}`}
-                      style={{
-                        position: 'absolute',
-                        top: `calc(${(i / 24) * 100}% - 8px)`,
-                        left: 8,
-                        fontSize: 12,
-                        color: '#2a5875'
-                      }}
+                      className="absolute left-2 text-xs text-[#2a5875]"
+                      style={{ top: `calc(${(i / 24) * 100}% - 8px)` }}
                     >
                       {String(i).padStart(2, '0')}:00
                     </div>
                   ))}
                   {/* Sleep blocks */}
                   {dayBlocks.map((b, idx) => {
-                  const topPct = (b.fromMin / minutesInDay) * 100
-                  const bottomPct = (b.toMin / minutesInDay) * 100
-                  const heightPct = Math.max(1.5, bottomPct - topPct)
-                  const label = `${new Date(b.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(b.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                  return (
-                    <div
-                      key={b.id || idx}
-                      title={label}
-                      style={{
-                        position: 'absolute',
-                        left: 72,
-                        right: 12,
-                        top: `calc(${topPct}% + 2px)`,
-                        height: `calc(${heightPct}% - 4px)`,
-                        background: 'linear-gradient(180deg, #9fd2ff, #74bfff)',
-                        border: '1px solid rgba(0,0,0,0.08)',
-                        borderRadius: 10,
-                        boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '6px 10px',
-                        color: '#08324f',
-                        fontSize: 12,
-                        overflow: 'hidden',
-                        cursor: 'grab'
-                      }}
-                      onMouseDown={(e) => {
-                        e.preventDefault()
-                        setDrag({ id: b.id, mode: 'move', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
-                      }}
-                    >
-                      {/* Resize handle - top */}
+                    const topPct = (b.fromMin / minutesInDay) * 100
+                    const bottomPct = (b.toMin / minutesInDay) * 100
+                    const heightPct = Math.max(1.5, bottomPct - topPct)
+                    const label = `${new Date(b.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(b.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                    return (
                       <div
-                        onMouseDown={(e) => {
-                          e.preventDefault(); e.stopPropagation()
-                          setDrag({ id: b.id, mode: 'resize-start', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
-                        }}
-                        style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 8, cursor: 'ns-resize' }}
-                      />
-                      {/* Resize handle - bottom */}
-                      <div
-                        onMouseDown={(e) => {
-                          e.preventDefault(); e.stopPropagation()
-                          setDrag({ id: b.id, mode: 'resize-end', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
-                        }}
-                        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 8, cursor: 'ns-resize' }}
-                      />
-                      <div style={{ fontWeight: 700, marginRight: 8 }}>Sleep</div>
-                      <div style={{ opacity: 0.8 }}>
-                        {label}
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleDeleteSession(b.id)
-                        }}
-                        onMouseDown={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                        }}
+                        key={b.id || idx}
+                        title={label}
+                        className="absolute left-[72px] right-3 bg-gradient-to-b from-[#9fd2ff] to-[#74bfff] border border-black/8 rounded-[10px] shadow-lg flex items-center px-2.5 py-1.5 text-[#08324f] text-xs overflow-hidden cursor-grab"
                         style={{
-                          position: 'absolute',
-                          top: 4,
-                          right: 4,
-                          appearance: 'none',
-                          border: 'none',
-                          background: 'rgba(255, 255, 255, 0.7)',
-                          borderRadius: '50%',
-                          width: 20,
-                          height: 20,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          fontSize: 14,
-                          color: '#b23b3b',
-                          fontWeight: 'bold',
-                          padding: 0,
-                          lineHeight: 1,
-                          transition: 'background 0.2s ease',
-                          zIndex: 10
+                          top: `calc(${topPct}% + 2px)`,
+                          height: `calc(${heightPct}% - 4px)`
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)'
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          setDrag({ id: b.id, mode: 'move', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
                         }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.7)'
-                        }}
-                        title="Delete sleep session"
                       >
-                        ×
-                      </button>
-                    </div>
-                  )
-                })}
+                        {/* Resize handle - top */}
+                        <div
+                          onMouseDown={(e) => {
+                            e.preventDefault(); e.stopPropagation()
+                            setDrag({ id: b.id, mode: 'resize-start', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
+                          }}
+                          className="absolute left-0 right-0 top-0 h-2 cursor-ns-resize"
+                        />
+                        {/* Resize handle - bottom */}
+                        <div
+                          onMouseDown={(e) => {
+                            e.preventDefault(); e.stopPropagation()
+                            setDrag({ id: b.id, mode: 'resize-end', fromMin0: b.fromMin, toMin0: b.toMin, pointerMin0: minuteFromClientY(e.clientY), fromMin: b.fromMin, toMin: b.toMin })
+                          }}
+                          className="absolute left-0 right-0 bottom-0 h-2 cursor-ns-resize"
+                        />
+                        <div className="font-bold mr-2">Sleep</div>
+                        <div className="opacity-80">
+                          {label}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDeleteSession(b.id)
+                          }}
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                          }}
+                          className="absolute top-1 right-1 appearance-none border-none bg-white/70 rounded-full w-5 h-5 flex items-center justify-center cursor-pointer text-sm text-[#b23b3b] font-bold p-0 leading-none transition-colors duration-200 z-10 hover:bg-white/90"
+                          title="Delete sleep session"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>
@@ -525,5 +405,3 @@ export default function App() {
     </div>
   )
 }
-
-
