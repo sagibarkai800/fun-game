@@ -20,7 +20,7 @@ export default function App() {
   const [manualError, setManualError] = useState('')
   const timelineRef = useRef(null)
   const [drag, setDrag] = useState(null) // { id, mode, fromMin0, toMin0, pointerMin0, fromMin, toMin }
-  const TIMELINE_HEIGHT = 960
+  const TIMELINE_HEIGHT = 480
 
   useEffect(() => {
     if (!isSleeping || !startAtMs) return
@@ -362,7 +362,7 @@ export default function App() {
               padding: 16
             }}>
               <div style={{ textAlign: 'left', fontWeight: 600, marginBottom: 8 }}>Today’s Schedule</div>
-              <div ref={timelineRef} style={{ position: 'relative', height: 960, overflow: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)', cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default' }}>
+              <div ref={timelineRef} style={{ position: 'relative', height: TIMELINE_HEIGHT, overflowY: 'auto', overflowX: 'hidden', borderRadius: 10, background: '#eef6ff', border: '1px solid rgba(0,0,0,0.06)', cursor: drag ? (drag.mode === 'move' ? 'grabbing' : 'ns-resize') : 'default' }}>
                 {/* Hour grid */}
                 {Array.from({ length: 25 }).map((_, i) => (
                   <div
