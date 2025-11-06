@@ -117,8 +117,9 @@ export default function App() {
     const el = timelineRef.current
     if (!el) return 0
     const rect = el.getBoundingClientRect()
-    const y = Math.min(Math.max(clientY - rect.top, 0), TIMELINE_HEIGHT)
-    const ratio = y / TIMELINE_HEIGHT
+    const fullHeight = 960 // Full 24-hour timeline height
+    const y = Math.min(Math.max(clientY - rect.top, 0), fullHeight)
+    const ratio = y / fullHeight
     return Math.round(ratio * minutesInDay)
   }
 
@@ -448,6 +449,7 @@ export default function App() {
                     </div>
                   )
                 })}
+                </div>
               </div>
             </div>
           </div>
