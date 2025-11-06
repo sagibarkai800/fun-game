@@ -245,8 +245,8 @@ export default function App() {
             </div>
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex-1 min-w-[320px] bg-white/60 border border-black/6 rounded-[14px] p-4">
+          <div className="mt-5 flex flex-col gap-4">
+            <div className="w-full bg-white/60 border border-black/6 rounded-[14px] p-4">
               <div className="text-5xl font-bold tracking-wider">
                 {formatDuration(displayMs)}
               </div>
@@ -306,7 +306,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex-[2] min-w-[420px] bg-white/60 border border-black/6 rounded-[14px] p-4">
+            <div className="w-full bg-white/60 border border-black/6 rounded-[14px] p-4">
               <div className="text-left font-semibold mb-2">Today's Schedule</div>
               <div 
                 className="overflow-y-auto overflow-x-hidden rounded-[10px] bg-[#eef6ff] border border-black/6"
